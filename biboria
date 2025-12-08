@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIBORIA - 治癒系森林 VR</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Varela Round', sans-serif;
+      overflow: hidden;
+    }
+
+    /* 根據 P.10 Color Palette 設定色票 */
+    :root {
+      --primary-green: #8CC63F; /* 草綠 */
+      --soft-white: #FCFCFC;
+      --text-brown: #5D4037;
+      --sky-blue: #87CEEB;
+    }
+
+    /* UI 覆蓋層 */
+    #ui-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+      font-family: 'Varela Round', sans-serif;
+    }
+
+    /* 讓按鈕可以被點擊 */
+    #ui-overlay button, 
+    #ui-overlay .menu-icon {
+      pointer-events: auto;
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .active {
+      display: flex !important;
+    }
+
+    /* ========== 開始畫面 ========== */
+    #start-screen {
+      background: linear-gradient(135deg, var(--sky-blue) 0%, var(--primary-green) 100%);
+      pointer-events: auto;
+    }
+
+    .logo {
+      font-size: 80px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+      letter-spacing: 5px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .subtitle {
+      font-size: 24px;
+      color: var(--soft-white);
+      margin-bottom: 50px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      letter-spacing: 2px;
+    }
+
+    /* 按鈕樣式：可愛風格 */
+    .cute-btn {
+      background: var(--primary-green);
+      color: white;
+      border: 4px solid white;
+      border-radius: 30px;
+      padding: 15px 40px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+      font-family: 'Varela Round', sans-serif;
+    }
+
+    .cute-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .cute-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ========== 過場介紹畫面 ========== */
+    #intro-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      z-index: 1000;
+    }
+
+    #intro-text {
+      color: white;
+      font-size: 32px;
+      text-align: center;
+      padding: 40px;
+      max-width: 800px;
+      line-height: 1.8;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== 遊戲 HUD ========== */
+    #game-hud {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 左上角選單按鈕 */
+    .menu-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(140, 198, 63, 0.9);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+
+    .menu-icon:hover {
+      background: var(--primary-green);
+      transform: scale(1.05);
+    }
+
+    /* 中央互動提示框 */
+    #interaction-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px 35px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      animation: bounceIn 0.5s ease-out;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: translate(-50%, -50%) scale(0); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    #interaction-hint .icon {
+      font-size: 48px;
+      animation: musicNote 1s ease-in-out infinite;
+    }
+
+    @keyframes musicNote {
+      0%, 100% { transform: translateY(0) rotate(-10deg); }
+      50% { transform: translateY(-10px) rotate(10deg); }
+    }
+
+    #interaction-hint p {
+      color: var(--text-brown);
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    /* 右下角 B 按鈕 */
+    .circle-btn {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--primary-green);
+      color: white;
+      border: 4px solid white;
+      font-size: 2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(140, 198, 63, 0.6);
+      animation: pulse 2s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Varela Round', sans-serif;
+      position: relative;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .circle-btn:hover {
+      animation: none;
+      transform: scale(1.15);
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      margin-bottom: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: normal;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .circle-btn:hover .tooltip {
+      opacity: 1;
+    }
+
+    /* 收集進度提示 */
+    #collection-progress {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 25px;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary-green);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border: 3px solid var(--primary-green);
+    }
+
+    /* ========== 結尾畫面 ========== */
+    #end-screen {
+      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(93,64,55,0.9) 100%);
+      pointer-events: auto;
+      animation: fadeIn 2s ease-in;
+    }
+
+    #end-screen h1 {
+      font-size: 64px;
+      color: var(--primary-green);
+      margin-bottom: 30px;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 20px rgba(140,198,63,0.5); }
+      50% { text-shadow: 0 0 40px rgba(140,198,63,0.8); }
+    }
+
+    #end-screen p {
+      font-size: 32px;
+      color: var(--soft-white);
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    }
+
+    /* 淡出動畫 */
+    .fade-out {
+      animation: fadeOut 3s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        background: black;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- UI 覆蓋層 -->
+  <div id="ui-overlay">
+    <!-- 開始畫面 -->
+    <div id="start-screen" class="screen active">
+      <div class="logo">🐑 BIBORIA 🌲</div>
+      <div class="subtitle">Forest Harmony Journey</div>
+      <button id="start-btn" class="cute-btn">START GAME</button>
+    </div>
+
+    <!-- 過場介紹 -->
+    <div id="intro-screen">
+      <div id="intro-text">
+        在一片靜謐的森林深處<br>
+        住著一隻名叫 Bibo 的指揮家綿羊...<br><br>
+        牠喜歡聆聽森林裡的每一個聲音<br>
+        並將它們編織成美妙的樂章<br><br>
+        今天,讓我們一起探索這片魔法森林吧!
+      </div>
+    </div>
+
+    <!-- 遊戲 HUD -->
+    <div id="game-hud" class="screen hidden">
+      <div class="menu-icon">
+        <svg viewBox="0 0 24 24" width="30" height="30">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="#FFF"/>
+        </svg>
+      </div>
+      
+      <div id="interaction-hint" class="hint-box hidden">
+        <span class="icon">🎵</span>
+        <p>靠近聆聽聲音</p>
+      </div>
+
+      <div id="collection-progress">已收集: 0/5</div>
+
+      <button id="ensemble-btn" class="circle-btn hidden">
+        B
+        <span class="tooltip">點擊合奏</span>
+      </button>
+    </div>
+
+    <!-- 結尾畫面 -->
+    <div id="end-screen" class="screen hidden">
+      <h1>🎵 Grand Concert! 🎵</h1>
+      <p>我們下次見!</p>
+    </div>
+  </div>
+
+  <!-- A-Frame 場景 -->
+  <a-scene>
+    <!-- 資源預載入 -->
+    <a-assets>
+      <!-- 預留 GLB 模型路徑 -->
+      <!-- <a-asset-item id="bibo-model" src="models/bibo.glb"></a-asset-item> -->
+      <!-- <a-asset-item id="tree-model" src="models/tree.glb"></a-asset-item> -->
+      <!-- <a-asset-item id="rock-model" src="models/rock.glb"></a-asset-item> -->
+      <!-- <a-asset-item id="frog-model" src="models/frog.glb"></a-asset-item> -->
+      
+      <!-- 音效 (預留) -->
+      <!-- <audio id="forest-ambient" src="sounds/forest.mp3" preload="auto"></audio> -->
+      <!-- <audio id="tree-sound" src="sounds/tree.mp3" preload="auto"></audio> -->
+    </a-assets>
+
+    <!-- 天空 -->
+    <a-sky color="#87CEEB"></a-sky>
+
+    <!-- 地面 -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" 
+             color="#8B7355" shadow></a-plane>
+
+    <!-- 森林草地區域 -->
+    <a-circle position="0 0.01 0" rotation="-90 0 0" radius="30" color="#8CC63F"></a-circle>
+
+    <!-- 主角 Bibo (綿羊) -->
+    <a-entity id="bibo" position="0 0.5 0">
+      <a-sphere radius="0.5" color="#FFFFFF" shadow></a-sphere>
+      <a-sphere position="0 0.7 0" radius="0.4" color="#FFFFFF" shadow></a-sphere>
+      <a-sphere position="-0.2 0.85 0.3" radius="0.1" color="#000000"></a-sphere>
+      <a-sphere position="0.2 0.85 0.3" radius="0.1" color="#000000"></a-sphere>
+      <a-cone position="0 1 0" radius-bottom="0.05" radius-top="0" height="0.3" 
+              color="#FFD700" rotation="0 0 0"></a-cone>
+    </a-entity>
+
+    <!-- 互動物件 1: 樹 -->
+    <a-entity id="tree1" class="interactive" position="-5 0 -5" 
+              data-sound="tree" data-collected="false">
+      <a-cylinder position="0 1 0" radius="0.3" height="2" color="#8B4513"></a-cylinder>
+      <a-cone position="0 2.5 0" radius-bottom="1.5" radius-top="0" height="2" 
+              color="#228B22" segments-radial="6"></a-cone>
+      <a-cone position="0 3.5 0" radius-bottom="1.2" radius-top="0" height="1.5" 
+              color="#32CD32" segments-radial="6"></a-cone>
+    </a-entity>
+
+    <!-- 互動物件 2: 石頭 -->
+    <a-entity id="rock1" class="interactive" position="5 0 -5" 
+              data-sound="rock" data-collected="false">
+      <a-dodecahedron position="0 0.5 0" radius="0.8" color="#696969"></a-dodecahedron>
+      <a-sphere position="-0.3 0.3 0.3" radius="0.3" color="#808080"></a-sphere>
+    </a-entity>
+
+    <!-- 互動物件 3: 青蛙 -->
+    <a-entity id="frog1" class="interactive" position="3 0 3" 
+              data-sound="frog" data-collected="false">
+      <a-sphere position="0 0.3 0" radius="0.4" color="#90EE90"></a-sphere>
+      <a-sphere position="-0.2 0.5 0.2" radius="0.15" color="#FFFFFF"></a-sphere>
+      <a-sphere position="0.2 0.5 0.2" radius="0.15" color="#FFFFFF"></a-sphere>
+      <a-sphere position="-0.2 0.5 0.3" radius="0.08" color="#000000"></a-sphere>
+      <a-sphere position="0.2 0.5 0.3" radius="0.08" color="#000000"></a-sphere>
+    </a-entity>
+
+    <!-- 互動物件 4: 花朵 -->
+    <a-entity id="flower1" class="interactive" position="-3 0 3" 
+              data-sound="flower" data-collected="false">
+      <a-cylinder position="0 0.3 0" radius="0.05" height="0.6" color="#228B22"></a-cylinder>
+      <a-sphere position="0 0.7 0" radius="0.15" color="#FFD700"></a-sphere>
+      <a-circle position="0.15 0.7 0.1" radius="0.1" color="#FF69B4" 
+                rotation="0 30 0"></a-circle>
+      <a-circle position="-0.15 0.7 0.1" radius="0.1" color="#FF69B4" 
+                rotation="0 -30 0"></a-circle>
+      <a-circle position="0 0.7 0.2" radius="0.1" color="#FF69B4" 
+                rotation="0 0 0"></a-circle>
+    </a-entity>
+
+    <!-- 互動物件 5: 鳥 -->
+    <a-entity id="bird1" class="interactive" position="0 3 -8" 
+              data-sound="bird" data-collected="false">
+      <a-sphere position="0 0 0" radius="0.3" color="#FF6347"></a-sphere>
+      <a-sphere position="0.2 0 0" radius="0.15" color="#FF4500"></a-sphere>
+      <a-triangle position="-0.3 0.15 0" scale="0.3 0.3 0.3" color="#FFD700" 
+                  rotation="0 -90 0"></a-triangle>
+      <a-triangle position="-0.5 0 0.3" scale="0.5 0.3 0.1" color="#8B4513" 
+                  rotation="0 45 0"></a-triangle>
+      <a-triangle position="-0.5 0 -0.3" scale="0.5 0.3 0.1" color="#8B4513" 
+                  rotation="0 -45 0"></a-triangle>
+    </a-entity>
+
+    <!-- 環境光 -->
+    <a-light type="ambient" color="#BBB"></a-light>
+    <a-light type="directional" position="5 10 5" intensity="0.8"></a-light>
+
+    <!-- 玩家視角相機 -->
+    <a-camera position="0 1.6 5" look-controls wasd-controls>
+      <a-cursor color="#8CC63F" raycaster="objects: .interactive"></a-cursor>
+    </a-camera>
+  </a-scene>
+
+  <script>
+    // 遊戲狀態機
+    const GameState = {
+      START: 'start',
+      INTRO: 'intro',
+      GAMEPLAY: 'gameplay',
+      CONCERT: 'concert',
+      ENDING: 'ending'
+    };
+
+    let currentState = GameState.START;
+    let collectedObjects = [];
+    const totalObjects = 5;
+
+    // UI 元素
+    const startScreen = document.getElementById('start-screen');
+    const introScreen = document.getElementById('intro-screen');
+    const gameHud = document.getElementById('game-hud');
+    const endScreen = document.getElementById('end-screen');
+    const startBtn = document.getElementById('start-btn');
+    const ensembleBtn = document.getElementById('ensemble-btn');
+    const interactionHint = document.getElementById('interaction-hint');
+    const collectionProgress = document.getElementById('collection-progress');
+    const menuIcon = document.querySelector('.menu-icon');
+
+    // 互動物件
+    const interactives = document.querySelectorAll('.interactive');
+    const bibo = document.getElementById('bibo');
+
+    // 開始遊戲
+    startBtn.addEventListener('click', () => {
+      currentState = GameState.INTRO;
+      startScreen.classList.remove('active');
+      startScreen.classList.add('hidden');
+      introScreen.style.display = 'flex';
+      
+      // 播放森林環境音 (預留)
+      // document.getElementById('forest-ambient').play();
+
+      // 5秒後進入遊戲
+      setTimeout(() => {
+        introScreen.style.display = 'none';
+        currentState = GameState.GAMEPLAY;
+        gameHud.classList.remove('hidden');
+        gameHud.classList.add('active');
+        updateProgress();
+      }, 5000);
+    });
+
+    // 更新收集進度
+    function updateProgress() {
+      collectionProgress.textContent = `已收集: ${collectedObjects.length}/${totalObjects}`;
+      
+      if (collectedObjects.length === totalObjects) {
+        ensembleBtn.classList.remove('hidden');
+      }
+    }
+
+    // 互動物件偵測
+    interactives.forEach(obj => {
+      obj.addEventListener('mouseenter', () => {
+        if (currentState === GameState.GAMEPLAY && 
+            obj.getAttribute('data-collected') === 'false') {
+          interactionHint.classList.remove('hidden');
+        }
+      });
+
+      obj.addEventListener('mouseleave', () => {
+        interactionHint.classList.add('hidden');
+      });
+
+      obj.addEventListener('click', () => {
+        if (currentState === GameState.GAMEPLAY && 
+            obj.getAttribute('data-collected') === 'false') {
+          collectObject(obj);
+        }
+      });
+    });
+
+    // 收集物件
+    function collectObject(obj) {
+      obj.setAttribute('data-collected', 'true');
+      collectedObjects.push(obj);
+      
+      // 播放特定聲音 (預留)
+      const soundType = obj.getAttribute('data-sound');
+      // document.getElementById(`${soundType}-sound`).play();
+
+      // 播放動畫 (放大縮小)
+      obj.setAttribute('animation', {
+        property: 'scale',
+        to: '1.3 1.3 1.3',
+        dur: 1500,
+        easing: 'easeInOutQuad',
+        loop: 1,
+        dir: 'alternate'
+      });
+
+      // 物件跟隨 Bibo
+      setTimeout(() => {
+        followBibo(obj);
+      }, 3000);
+
+      updateProgress();
+      interactionHint.classList.add('hidden');
+    }
+
+    // 物件跟隨主角
+    function followBibo(obj) {
+      const offset = collectedObjects.indexOf(obj);
+      const angle = (offset / totalObjects) * Math.PI * 2;
+      const radius = 2;
+      
+      obj.setAttribute('animation', {
+        property: 'position',
+        to: `${Math.cos(angle) * radius} 1 ${Math.sin(angle) * radius}`,
+        dur: 2000,
+        easing: 'easeInOutQuad'
+      });
+
+      // 持續跟隨 (簡化版)
+      setInterval(() => {
+        if (currentState === GameState.GAMEPLAY || currentState === GameState.CONCERT) {
+          const biboPos = bibo.getAttribute('position');
+          obj.setAttribute('position', {
+            x: biboPos.x + Math.cos(angle) * radius,
+            y: 1,
+            z: biboPos.z + Math.sin(angle) * radius
+          });
+        }
+      }, 100);
+    }
+
+    // 合奏按鈕
+    ensembleBtn.addEventListener('click', () => {
+      if (currentState === GameState.GAMEPLAY) {
+        startConcert();
+      }
+    });
+
+    // 開始合奏
+    function startConcert() {
+      currentState = GameState.CONCERT;
+      ensembleBtn.classList.add('hidden');
+
+      // Bibo 指揮動畫
+      bibo.setAttribute('animation', {
+        property: 'rotation',
+        to: '0 360 0',
+        dur: 3000,
+        easing: 'linear',
+        loop: 3
+      });
+
+      // 所有收集物旋轉
+      collectedObjects.forEach((obj, i) => {
+        setTimeout(() => {
+          obj.setAttribute('animation__rotate', {
+            property: 'rotation',
+            to: '0 720 0',
+            dur: 2000,
+            easing: 'easeInOutQuad'
+          });
+          obj.setAttribute('animation__bounce', {
+            property: 'position.y',
+            to: '2',
+            dur: 1000,
+            dir: 'alternate',
+            loop: 4,
+            easing: 'easeInOutQuad'
+          });
+        }, i * 300);
+      });
+
+      // 合奏結束後進入結尾
+      setTimeout(() => {
+        showEnding();
+      }, 10000);
+    }
+
+    // 顯示結尾
+    function showEnding() {
+      currentState = GameState.ENDING;
+      gameHud.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+      endScreen.classList.add('active');
+
+      // 5秒後淡出
+      setTimeout(() => {
+        endScreen.classList.add('fade-out');
+      }, 5000);
+    }
+
+    // 選單按鈕 (預留功能)
+    menuIcon.addEventListener('click', () => {
+      alert('選單功能開發中...\n\n可以加入:\n- 重新開始\n- 設定\n- 關於');
+    });
+  </script>
+</body>
+</html>
