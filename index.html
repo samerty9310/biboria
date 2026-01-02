@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BIBORIA | 森林合唱團</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Itim&display=swap" rel="stylesheet">
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #d1f2f5;
+            font-family: "Microsoft JhengHei", sans-serif;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        #bg-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            transition: opacity 0.8s;
+            background: #d1f2f5;
+        }
+
+        #bg-video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6);
+        }
+
+        .vr-tag-container {
+            position: fixed;
+            top: 30px;
+            left: 12%;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: 0.5s;
+        }
+
+        .vr-tag {
+            font-size: 14px;
+            color: #7BC8A4;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        #top-nav {
+            position: fixed;
+            top: 30px;
+            right: 8%;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 10px 25px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            transition: 0.5s;
+        }
+
+        .nav-item {
+            color: #4B4444;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 15px;
+            transition: 0.3s;
+            border-radius: 20px;
+        }
+
+        .nav-item:hover {
+            background: #7BC8A4;
+            color: white;
+        }
+
+        #cover {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 12%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.95) 40%, transparent);
+            transition: opacity 0.6s;
+        }
+
+        .main-logo {
+            font-family: 'Gaegu', 'Itim', "Microsoft JhengHei", sans-serif;
+            font-size: 110px;
+            color: #52c498;
+            margin: 0;
+            font-weight: 900;
+            letter-spacing: 3px;
+            line-height: 1;
+            text-shadow: 0px 0px 0px #FFF, 8px 8px 20px rgba(123, 200, 164, 0.3);
+            display: inline-block;
+        }
+
+        .sub-title {
+            font-size: 28px;
+            color: #7BC8A4;
+            margin: 10px 0 20px 0;
+            font-weight: bold;
+        }
+
+        .slogan {
+            font-size: 18px;
+            color: #666;
+            border-left: 4px solid #7BC8A4;
+            padding-left: 15px;
+            margin-bottom: 40px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .start-btn {
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            background: #7BC8A4;
+            color: white;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(123, 200, 164, 0.4);
+        }
+
+        .trailer-btn {
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid #7BC8A4;
+            cursor: pointer;
+            background: transparent;
+            color: #7BC8A4;
+        }
+
+        #video-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .video-box {
+            width: 600px;
+            height: 600px;
+            background: #000;
+            border: 10px solid white;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #modal-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 10;
+            font-weight: bold;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: white;
+            width: 500px;
+            max-width: 85%;
+            border-radius: 40px;
+            padding: 40px;
+            position: relative;
+            text-align: center;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .char-img-container {
+            background: #f0f0f0;
+            width: 200px;
+            height: 200px;
+            margin: 15px auto;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .char-img {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+        }
+
+        .arrow-btn {
+            background: #f0f0f0;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #7BC8A4;
+            font-size: 20px;
+        }
+
+        #char-speaker-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #7BC8A4;
+            color: white;
+            border: 4px solid white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: 0.2s;
+        }
+
+        #game-ui {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 500;
+            display: none;
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .ui-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .hint {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #7BC8A4;
+            border: 2px solid #7BC8A4;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .map-toggle {
+            background: #7BC8A4;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #settings-menu {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            z-index: 1100;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 25px;
+            border: 2px solid #7BC8A4;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            width: 140px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 12px;
+            color: #4B4444;
+            font-weight: bold;
+        }
+
+        #mini-map {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 4px solid #7BC8A4;
+            border-radius: 15px;
+            display: none;
+            overflow: hidden;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        #map-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 修正後的角色圖標 UI: 兩排 (3x2) */
+        #collection-ui {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .collected-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #7BC8A4;
+            overflow: hidden;
+        }
+
+        .collected-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #ensemble-trigger {
+            display: none;
+            padding: 10px 20px;
+            background: #FFD700;
+            color: #4B4444;
+            border: 3px solid white;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            animation: pulse 1.5s infinite;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        #interaction-ui {
+            position: fixed;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        #explore-btn {
+            padding: 15px 45px;
+            border-radius: 50px;
+            background: #FFD700;
+            color: #4B4444;
+            border: 4px solid white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: pulse 1.5s infinite;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #interaction-hint {
+            margin-bottom: 15px;
+            color: white;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        #progress-container {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            display: none;
+            pointer-events: none;
+        }
+
+        .progress-bar {
+            fill: none;
+            stroke: #FFD700;
+            stroke-width: 6;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 157;
+            stroke-linecap: round;
+        }
+
+        #joystick-wrapper {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            z-index: 2000;
+            display: none;
+            touch-action: none;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        #joystick-stick {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            background: #7BC8A4;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            #cover {
+                padding: 0 5%;
+                justify-content: center;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.85);
+            }
+
+            .main-logo {
+                font-size: 60px;
+            }
+
+            .sub-title {
+                font-size: 20px;
+            }
+
+            .slogan {
+                font-size: 14px;
+                border-left: none;
+                padding-left: 0;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .start-btn,
+            .trailer-btn {
+                width: 200px;
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .video-box {
+                width: 90vw;
+                height: 90vw;
+                border-width: 5px;
+            }
+
+            #top-nav {
+                right: 5%;
+                top: 20px;
+                padding: 5px 15px;
+            }
+
+            .vr-tag-container {
+                left: 5%;
+                top: 20px;
+                padding: 5px 15px;
+            }
+
+            .hint {
+                display: none;
+            }
+
+            #settings-menu {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        #fade-overlay {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 5000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #ensemble-video-container {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: none;
+            background: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 修正後的合奏影片視窗: 強制正方形 */
+        .ensemble-video-box {
+            width: min(80vh, 85vw);
+            height: min(80vh, 85vw);
+            aspect-ratio: 1 / 1;
+            background: #000;
+            border: 8px solid white;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #ensemble-video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #curtain-container {
+            position: fixed;
+            inset: 0;
+            z-index: 6000;
+            display: none;
+            pointer-events: none;
+        }
+
+        .curtain-part {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: #b22222;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+            transition: transform 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        #curtain-left {
+            left: 0;
+            transform: translateX(-100%);
+        }
+
+        #curtain-right {
+            right: 0;
+            transform: translateX(100%);
+        }
+
+        #success-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 7000;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .success-card {
+            background: white;
+            padding: 40px;
+            border-radius: 40px;
+            text-align: center;
+            border: 8px solid #7BC8A4;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="fade-overlay"></div>
+    <div id="curtain-container">
+        <div id="curtain-left" class="curtain-part"></div>
+        <div id="curtain-right" class="curtain-part"></div>
+    </div>
+    <div id="success-modal">
+        <div class="success-card">
+            <h2 style="color: #7BC8A4; font-size: 36px; margin-bottom: 20px;">表演大成功！</h2>
+            <p style="color: #666; font-size: 18px; margin-bottom: 30px;">恭喜你帶領 Bibo 的森林合唱團完成演出！</p>
+            <button class="start-btn" onclick="location.reload()">確認並返回主介面</button>
+        </div>
+    </div>
+
+    <div id="joystick-wrapper">
+        <div id="joystick-stick"></div>
+    </div>
+
+    <div id="settings-menu">
+        <div class="setting-item"><label>森林音量</label><input type="range" id="volume-slider" min="0" max="1" step="0.1"
+                value="0.5"></div>
+        <div class="setting-item"><label>Bibo 速度</label><input type="range" id="speed-slider" min="0.2" max="1.5"
+                step="0.1" value="0.5"></div>
+    </div>
+
+    <div id="ensemble-video-container">
+        <div class="ensemble-video-box"><video id="ensemble-video-player" playsinline loop muted>
+                <source src="assets/videos/cutscene_ensemble.mp4" type="video/mp4">
+            </video></div>
+    </div>
+    <div id="bg-container"><video id="bg-video-bg" autoplay muted loop playsinline>
+            <source src="assets/videos/bg_video_loop.mp4" type="video/mp4">
+        </video></div>
+    <div id="vr-tag-box" class="vr-tag-container"><span class="vr-tag">VR 音樂遊戲</span></div>
+    <div id="top-nav">
+        <div class="nav-item" onclick="openStory()">說明</div>
+        <div class="nav-item" onclick="openChar()">角色</div>
+    </div>
+
+    <div id="cover">
+        <div class="brand-section">
+            <h1 class="main-logo">BIBORIA</h1>
+            <div class="sub-title">Bibo 的森林合唱團</div>
+            <p class="slogan">在可愛的BIBORIA森林裡，發現有趣的聲音!<br>請繞開會擋路的石子、房屋和喬木喔~</p>
+            <div class="btn-group">
+                <button class="start-btn" id="start-btn">開始冒險 ➔</button>
+                <button class="trailer-btn" onclick="openTrailer()">觀看預告</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="video-modal" onclick="if(event.target === this) closeTrailer()">
+        <div class="video-box"><span class="video-close" onclick="closeTrailer()">×</span><video id="modal-video"
+                playsinline>
+                <source src="assets/videos/ui_trailer.mp4" type="video/mp4">
+            </video></div>
+    </div>
+
+    <div id="story-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-close" onclick="closeAllModals()">×</div>
+            <h2 style="color: #7BC8A4;">我們的故事</h2>
+            <p style="text-align: left; line-height: 1.8; color: #555; font-size: 14px;">歡迎來到
+                Biboria！這是一個清新治癒的可愛森林世界。<br><br>你是一位表演團隊的團長 — <b>小羊 Bibo</b>，試著在森林裡找到你的音樂合奏夥伴吧！</p>
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 20px; text-align: left;">
+                <h4 style="margin: 0 0 5px 0; color: #4B4444;">🎮 操作說明</h4>
+                <ul style="font-size: 13px; margin: 0; padding-left: 20px; color: #666;">
+                    <li><b>移動</b>：電腦使用方向鍵 / 手機使用左下角搖桿</li>
+                    <li><b>聽音樂</b>：靠近角色點擊 🎵</li>
+                    <li><b>收編夥伴</b>：音樂聽完後，<b>長按 🎵 按鈕</b>至滿格！</li>
+                </ul>
+            </div>
+            <button class="start-btn" style="padding: 10px 30px; margin-top: 20px;"
+                onclick="closeAllModals()">我知道了！</button>
+        </div>
+    </div>
+
+    <div id="char-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-close" onclick="closeAllModals()">×</div>
+            <h2 style="color: #7BC8A4;">森林居民</h2>
+            <div class="char-img-container"><button id="char-speaker-btn">📢</button><img
+                    src="assets/images/ui_icon_bibo.png" class="char-img" id="display-img"></div>
+            <h3 id="display-name">小羊 Bibo</h3>
+            <p id="display-desc" style="color: #666; height: 60px; font-size: 14px;">表演團隊的團長！擁有一顆溫暖的心。</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <button class="arrow-btn" onclick="prevChar()">❮</button>
+                <div id="char-count">1 / 7</div>
+                <button class="arrow-btn" onclick="nextChar()">❯</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-ui">
+        <div class="ui-row"><button class="map-toggle" id="map-btn">🗺️ 地圖指標</button>
+            <div class="hint">↑↓←→ 轉向移動</div>
+        </div>
+        <div id="mini-map"><canvas id="map-canvas" width="160" height="160"></canvas></div>
+    </div>
+
+    <div id="collection-ui">
+        <button id="ensemble-trigger">大合奏 ➔</button>
+        <div class="collection-grid" id="collection-grid">
+        </div>
+    </div>
+
+    <div id="interaction-ui">
+        <div id="interaction-hint">可以聆聽旋律，長按收編 🎵</div>
+        <button id="explore-btn">🎵</button>
+        <div id="progress-container">
+            <svg style="transform: rotate(-90deg)" width="60" height="60">
+                <circle cx="30" cy="30" r="25" stroke="rgba(255,255,255,0.3)" stroke-width="6" fill="none" />
+                <circle class="progress-bar" cx="30" cy="30" r="25" />
+            </svg>
+        </div>
+    </div>
+
+    <script
+        type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        let scene, camera, renderer, bibo, terrain;
+        let keys = {};
+        let activePartnerData = null, currentAudio = null, ensembleAudio = null, collectedPartners = [];
+        let holdRequest = null, isEnsembleMode = false, charPreviewAudio = null;
+        let mapCanvas, mapCtx;
+        const coverBGM = new Audio('assets/audio/bgm_cover_theme.mp3'); coverBGM.loop = true;
+        const forestBGM = new Audio('assets/audio/bgm_gameplay_forest.mp3'); forestBGM.loop = true;
+        let biboSpeed = 0.5;
+        const MODEL_FORWARD_OFFSET = Math.PI / 2;
+        const raycaster = new THREE.Raycaster();
+        const downVector = new THREE.Vector3(0, -1, 0);
+        const MAP_SIZE = 600;
+        const partnerModels = [], houseModels = [], clouds = [];
+        const characters = [
+            { name: "小羊 Bibo", img: "assets/images/ui_icon_bibo.png", desc: "表演團隊的團長！擁有一顆溫暖的心。" },
+            { name: "石頭先生", desc: "有自己獨特的節奏，是沉穩的鼓手。", file: "assets/models/character_rock.glb", bgm: "assets/audio/sfx_voice_rock.m4a", img: "assets/images/ui_icon_rock.png", scale: 8, offset: 3, rot: Math.PI },
+            { name: "蘑菇寶寶", desc: "喜歡在草地上跑跳，配上快樂的扭扭舞。", file: "assets/models/character_mushroom.glb", bgm: "assets/audio/sfx_voice_mushroom.m4a", img: "assets/images/ui_icon_mushroom.png", scale: 7, offset: 3, rot: Math.PI * 2 },
+            { name: "小鳥妹妹", desc: "擁有清亮高音，聲音婉轉動聽。", file: "assets/models/character_bird.glb", bgm: "assets/audio/sfx_voice_bird.m4a", img: "assets/images/ui_icon_bird.png", scale: 5, offset: 3, rot: Math.PI * 0.3 },
+            { name: "大樹先生", desc: "紳士的大樹先生總在風吹的時候輕輕歌唱。", file: "assets/models/character_tree.glb", bgm: "assets/audio/sfx_voice_tree.m4a", img: "assets/images/ui_icon_tree.png", scale: 10, offset: 0, rot: 0 },
+            { name: "青蛙哥哥", desc: "活力十足的貝斯手，節奏感爆棚。", file: "assets/models/character_frog.glb", bgm: "assets/audio/sfx_voice_frog.m4a", img: "assets/images/ui_icon_frog.png", scale: 10, offset: 4, rot: -Math.PI * 0.3 },
+            { name: "喇叭花小姐", desc: "輕柔的伴奏，旋律充滿詩意。", file: "assets/models/character_flower.glb", bgm: "assets/audio/sfx_voice_flower.m4a", img: "assets/images/ui_icon_flower.png", scale: 6, offset: 3, rot: Math.PI * 0.8 }
+        ];
+
+        let joystickData = { active: false, x: 0, y: 0 };
+        const joyWrapper = document.getElementById('joystick-wrapper');
+        const joyStick = document.getElementById('joystick-stick');
+
+        document.body.addEventListener('click', () => { if (coverBGM.paused && document.getElementById('cover').style.display !== 'none') coverBGM.play(); }, { once: true });
+
+        let charIndex = 0;
+        window.openStory = () => document.getElementById('story-modal').style.display = 'flex';
+        window.openChar = () => { document.getElementById('char-modal').style.display = 'flex'; updateUI(); };
+        window.closeAllModals = () => {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+            if (charPreviewAudio) { charPreviewAudio.pause(); charPreviewAudio.currentTime = 0; coverBGM.muted = false; }
+        };
+        window.nextChar = () => { charIndex = (charIndex + 1) % characters.length; updateUI(); };
+        window.prevChar = () => { charIndex = (charIndex - 1 + characters.length) % characters.length; updateUI(); };
+
+        function updateUI() {
+            document.getElementById('display-name').innerText = characters[charIndex].name;
+            document.getElementById('display-desc').innerText = characters[charIndex].desc;
+            document.getElementById('display-img').src = characters[charIndex].img;
+            document.getElementById('char-count').innerText = `${charIndex + 1} / ${characters.length}`;
+        }
+
+        document.getElementById('char-speaker-btn').onclick = () => {
+            if (charPreviewAudio) { charPreviewAudio.pause(); charPreviewAudio.currentTime = 0; }
+            coverBGM.muted = true;
+            charPreviewAudio = new Audio(characters[charIndex].bgm || 'bibo.m4a');
+            charPreviewAudio.play();
+            charPreviewAudio.onended = () => { coverBGM.muted = false; };
+        };
+
+        const mVideo = document.getElementById('modal-video'), vModal = document.getElementById('video-modal');
+        window.openTrailer = () => { vModal.style.display = 'flex'; mVideo.currentTime = 0; mVideo.play(); coverBGM.muted = true; };
+        window.closeTrailer = () => { mVideo.pause(); vModal.style.display = 'none'; coverBGM.muted = false; };
+
+        function initJoystick() {
+            joyWrapper.style.display = 'block';
+            const handleTouch = (e) => {
+                const touch = e.touches[0];
+                const rect = joyWrapper.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                let dx = touch.clientX - centerX;
+                let dy = touch.clientY - centerY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const maxDist = rect.width / 2;
+                if (dist > maxDist) { dx *= maxDist / dist; dy *= maxDist / dist; }
+                joyStick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+                joystickData = { active: true, x: dx / maxDist, y: -dy / maxDist };
+            };
+            joyWrapper.addEventListener('touchstart', (e) => { e.preventDefault(); handleTouch(e); }, { passive: false });
+            joyWrapper.addEventListener('touchmove', (e) => { e.preventDefault(); handleTouch(e); }, { passive: false });
+            joyWrapper.addEventListener('touchend', () => {
+                joyStick.style.transform = `translate(-50%, -50%)`;
+                joystickData = { active: false, x: 0, y: 0 };
+            });
+        }
+
+        document.getElementById('start-btn').onclick = () => {
+            coverBGM.pause();
+            document.getElementById('cover').style.opacity = '0';
+            document.getElementById('bg-container').style.opacity = '0';
+            document.getElementById('top-nav').style.display = 'none';
+            document.getElementById('vr-tag-box').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('cover').style.display = 'none';
+                document.getElementById('bg-container').style.display = 'none';
+                document.getElementById('game-ui').style.display = 'block';
+                document.getElementById('settings-menu').style.display = 'flex';
+                if ('ontouchstart' in window) initJoystick();
+                setTimeout(() => document.getElementById('game-ui').style.opacity = '1', 50);
+                initGame();
+                forestBGM.volume = 0.5; forestBGM.play();
+            }, 600);
+        };
+
+        document.getElementById('volume-slider').oninput = (e) => { forestBGM.volume = e.target.value; };
+        document.getElementById('speed-slider').oninput = (e) => { biboSpeed = parseFloat(e.target.value); };
+        window.addEventListener('keydown', (e) => { keys[e.code] = true; if (e.code === 'Escape') location.reload(); });
+        window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+        async function initGame() {
+            try {
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xd1f2f5);
+                scene.fog = new THREE.FogExp2(0xd1f2f5, 0.002);
+                camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                document.body.appendChild(renderer.domElement);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+                sun.position.set(100, 200, 100); sun.castShadow = true;
+                scene.add(sun);
+
+                const loader = new GLTFLoader();
+                const texLoader = new THREE.TextureLoader();
+
+                // Helper: Promisified loader with error handling
+                const loadModel = (url) => {
+                    return new Promise((resolve, reject) => {
+                        loader.load(url, resolve, undefined, (err) => reject(new Error(`Failed to load ${url}: ${err.message || 'unknown error'}`)));
+                    });
+                };
+
+                // Helper: Decorated load for non-critical assets
+                const loadDecorSafe = (url, callback) => {
+                    loader.load(url, callback, undefined, (err) => console.warn(`Decor load failed for ${url}`, err));
+                };
+
+                const groundTex = texLoader.load('assets/images/texture_terrain_ground.png');
+                groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping; groundTex.repeat.set(15, 15);
+                const geometry = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, 60, 60);
+                const posAttr = geometry.attributes.position;
+                for (let i = 0; i < posAttr.count; i++) {
+                    posAttr.setZ(i, Math.sin(posAttr.getX(i) * 0.02) * Math.cos(posAttr.getY(i) * 0.02) * 12);
+                }
+                geometry.computeVertexNormals();
+                terrain = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ map: groundTex, color: 0x33cc33, roughness: 1.0, emissive: 0x224422, emissiveIntensity: 0.5 }));
+                terrain.rotation.x = -Math.PI / 2; terrain.receiveShadow = true;
+                scene.add(terrain);
+                mapCanvas = document.getElementById('map-canvas'); mapCtx = mapCanvas.getContext('2d');
+
+                // Load Bibo (Critical)
+                try {
+                    const gltf = await loadModel('assets/models/character_bibo.glb');
+                    bibo = gltf.scene;
+                    bibo.scale.set(10, 10, 10);
+                    bibo.position.set(0, 50, 0);
+                    scene.add(bibo);
+                } catch (e) {
+                    console.error(e);
+                    alert("載入主角失敗，請確認檔案路徑或是否受到跨域(CORS)限制。" + e.message);
+                }
+
+                const partnerPositions = [];
+                for (let c of characters) {
+                    if (!c.file) continue;
+                    try {
+                        const gltf = await loadModel(c.file);
+                        const m = gltf.scene; let rx, rz, isSafe;
+                        do {
+                            isSafe = true; rx = (Math.random() - 0.5) * (MAP_SIZE - 120); rz = (Math.random() - 0.5) * (MAP_SIZE - 120);
+                            if (Math.abs(rx) < 60 && Math.abs(rz) < 60) isSafe = false;
+                            for (let p of partnerPositions) if (Math.sqrt((rx - p.x) ** 2 + (rz - p.z) ** 2) < 40) isSafe = false;
+                        } while (!isSafe);
+                        m.position.set(rx, 50, rz); if (c.rot !== undefined) m.rotation.y = c.rot;
+                        m.scale.set(c.scale, c.scale, c.scale); scene.add(m);
+                        partnerPositions.push({ x: rx, z: rz }); partnerModels.push({ model: m, offset: c.offset, config: c, isCollected: false, hasHeardFull: false });
+                    } catch (e) {
+                        console.warn(`Partner load failed ${c.name}`, e);
+                    }
+                }
+
+                createEnvironment(partnerPositions);
+                createClouds();
+
+                // Load decor (Non-blocking)
+                for (let i = 0; i < 8; i++) {
+                    loadDecorSafe('assets/models/env_house_decor.glb', g => {
+                        const h = g.scene.clone(); // Clone usually safer if reusing object is tricky, but original new GLTFLoader creates new instance every load call. 
+                        // Original code called load 8 times. Keep behavior.
+                        let rx, rz, isNear;
+                        do {
+                            isNear = false; rx = (Math.random() - 0.5) * (MAP_SIZE - 100); rz = (Math.random() - 0.5) * (MAP_SIZE - 100);
+                            if (Math.abs(rx) < 70 && Math.abs(rz) < 70) isNear = true;
+                            for (let p of partnerPositions) if (Math.sqrt((rx - p.x) ** 2 + (rz - p.z) ** 2) < 55) isNear = true;
+                        } while (isNear);
+                        const rs = 45; h.position.set(rx, 50, rz); h.scale.set(rs, rs, rs); h.userData.terrainOffset = 15; scene.add(h); houseModels.push(h);
+                    });
+                }
+
+                const customModels = [{ file: 'assets/models/env_generated_tree.glb', count: 8, scale: 50, offset: 20 }, { file: 'assets/models/env_generated_flower.glb', count: 10, scale: 12, offset: 2 }];
+                customModels.forEach(cm => {
+                    for (let i = 0; i < cm.count; i++) {
+                        loadDecorSafe(cm.file, g => {
+                            const h = g.scene; // Again, original logic: load N times.
+                            let rx, rz, isNear;
+                            do {
+                                isNear = false; rx = (Math.random() - 0.5) * (MAP_SIZE - 100); rz = (Math.random() - 0.5) * (MAP_SIZE - 100);
+                                if (Math.abs(rx) < 70 && Math.abs(rz) < 70) isNear = true;
+                                for (let p of partnerPositions) if (Math.sqrt((rx - p.x) ** 2 + (rz - p.z) ** 2) < 40) isNear = true;
+                            } while (isNear);
+                            h.position.set(rx, 50, rz); h.scale.set(cm.scale, cm.scale, cm.scale); h.userData.terrainOffset = cm.offset; scene.add(h); houseModels.push(h);
+                        });
+                    }
+                });
+
+                // Ensure UI and loop start even if some assets fail
+                animate(); initMapUI(); initEnsemble(); initInteractions();
+
+            } catch (err) {
+                console.error("Critical Init Error", err);
+                alert("遊戲嚴重錯誤: " + err.message);
+            }
+        }
+
+        function createEnvironment(safePoints) {
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41 });
+            for (let i = 0; i < 50; i++) {
+                let group = new THREE.Group();
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 15, 8), trunkMat); trunk.position.y = 7.5; group.add(trunk);
+                const leaves = new THREE.Mesh(new THREE.SphereGeometry(6, 12, 12), new THREE.MeshStandardMaterial({ color: 0x1E5631 })); leaves.position.y = 15; group.add(leaves); group.scale.set(5, 5, 5);
+                let rx, rz, isNear;
+                do {
+                    isNear = false; rx = (Math.random() - 0.5) * 540; rz = (Math.random() - 0.5) * 540;
+                    for (let p of safePoints) if (Math.sqrt((rx - p.x) ** 2 + (rz - p.z) ** 2) < 25) isNear = true;
+                } while (isNear);
+                group.position.set(rx, 100, rz); scene.add(group); setTimeout(() => adjustToTerrain(group, 0), 200);
+            }
+        }
+
+        function createClouds() {
+            const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+            for (let i = 0; i < 20; i++) {
+                const c = new THREE.Mesh(new THREE.SphereGeometry(15, 8, 8), mat); c.scale.set(2, 0.6, 1.2);
+                c.position.set((Math.random() - 0.5) * 800, 45 + Math.random() * 20, (Math.random() - 0.5) * 800); scene.add(c); clouds.push(c);
+            }
+        }
+
+        function adjustToTerrain(o, f) {
+            if (!terrain) return; raycaster.set(new THREE.Vector3(o.position.x, 200, o.position.z), downVector);
+            const intersects = raycaster.intersectObject(terrain);
+            if (intersects.length > 0) o.position.y = intersects[0].point.y + (f || 0);
+        }
+
+        function initMapUI() {
+            const btn = document.getElementById('map-btn'), map = document.getElementById('mini-map');
+            btn.onclick = () => map.style.display = (map.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function updateMiniMap() {
+            if (!mapCtx || !bibo) return;
+            mapCtx.clearRect(0, 0, 160, 160); mapCtx.fillStyle = "rgba(123, 200, 164, 0.2)"; mapCtx.fillRect(0, 0, 160, 160);
+            partnerModels.forEach(pm => {
+                if (!pm.isCollected) {
+                    const mx = (pm.model.position.x / MAP_SIZE) * 160 + 80;
+                    const mz = (pm.model.position.z / MAP_SIZE) * 160 + 80;
+                    mapCtx.fillStyle = "#3498db"; mapCtx.beginPath(); mapCtx.arc(mx, mz, 4, 0, Math.PI * 2); mapCtx.fill();
+                }
+            });
+            const px = (bibo.position.x / MAP_SIZE) * 160 + 80; const pz = (bibo.position.z / MAP_SIZE) * 160 + 80;
+            mapCtx.fillStyle = "#e74c3c"; mapCtx.beginPath(); mapCtx.arc(px, pz, 6, 0, Math.PI * 2); mapCtx.fill();
+            mapCtx.strokeStyle = "white"; mapCtx.lineWidth = 2; mapCtx.stroke();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!isEnsembleMode && bibo) {
+                if (keys['ArrowLeft']) bibo.rotation.y += 0.03;
+                if (keys['ArrowRight']) bibo.rotation.y -= 0.03;
+                if (joystickData.active) bibo.rotation.y += -joystickData.x * 0.05;
+
+                const ma = bibo.rotation.y + MODEL_FORWARD_OFFSET, fwd = new THREE.Vector3(Math.sin(ma), 0, Math.cos(ma)), next = bibo.position.clone();
+
+                if (keys['ArrowUp']) next.addScaledVector(fwd, biboSpeed);
+                if (keys['ArrowDown']) next.addScaledVector(fwd, -biboSpeed);
+                if (joystickData.active) next.addScaledVector(fwd, joystickData.y * biboSpeed);
+
+                let canMove = true;
+                for (let o of houseModels) {
+                    if (new THREE.Vector2(next.x, next.z).distanceTo(new THREE.Vector2(o.position.x, o.position.z)) < 5) canMove = false;
+                }
+                if (canMove) bibo.position.copy(next); adjustToTerrain(bibo, 0);
+                camera.position.lerp(bibo.position.clone().add(new THREE.Vector3(Math.sin(ma), 0, Math.cos(ma)).multiplyScalar(-45)).add(new THREE.Vector3(0, 20, 0)), 0.1);
+                camera.lookAt(bibo.position.x, bibo.position.y + 8, bibo.position.z);
+                partnerModels.forEach(pm => {
+                    if (pm.isCollected) {
+                        const idx = collectedPartners.indexOf(pm), dist = -12 - (idx * 8);
+                        pm.model.position.lerp(bibo.position.clone().add(fwd.clone().multiplyScalar(dist)), 0.1);
+                        pm.model.rotation.y = THREE.MathUtils.lerp(pm.model.rotation.y, bibo.rotation.y, 0.1);
+                        adjustToTerrain(pm.model, pm.offset);
+                    } else adjustToTerrain(pm.model, pm.offset);
+                });
+                checkProximity(); updateMiniMap();
+            }
+            houseModels.forEach(h => adjustToTerrain(h, h.userData.terrainOffset));
+            renderer.render(scene, camera);
+        }
+
+        function checkProximity() {
+            let found = false; partnerModels.forEach(pm => { if (!pm.isCollected && bibo.position.distanceTo(pm.model.position) < 25) { found = true; activePartnerData = pm; } });
+            const ui = document.getElementById('interaction-ui');
+            ui.style.display = found ? 'block' : 'none';
+            document.getElementById('interaction-hint').style.display = (found && activePartnerData.hasHeardFull) ? 'block' : 'none';
+        }
+
+        function initInteractions() {
+            const btn = document.getElementById('explore-btn'), pb = document.querySelector('.progress-bar');
+            const pc = document.getElementById('progress-container');
+
+            const startHold = (e) => {
+                if (e) e.preventDefault();
+                if (!activePartnerData) return;
+
+                if (!activePartnerData.hasHeardFull) {
+                    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+                    forestBGM.muted = true;
+                    currentAudio = new Audio(activePartnerData.config.bgm);
+                    currentAudio.play();
+                    currentAudio.onended = () => { activePartnerData.hasHeardFull = true; forestBGM.muted = false; checkProximity(); };
+                    return;
+                }
+
+                pc.style.display = 'block';
+                let startTime = null;
+                const duration = 1500;
+                const step = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    pb.style.strokeDashoffset = 157 - (157 * progress);
+                    if (progress < 1) { holdRequest = requestAnimationFrame(step); }
+                    else { collectPartner(); endHold(); }
+                };
+                holdRequest = requestAnimationFrame(step);
+            };
+
+            const endHold = () => {
+                if (holdRequest) { cancelAnimationFrame(holdRequest); holdRequest = null; }
+                pc.style.display = 'none';
+                pb.style.strokeDashoffset = 157;
+            };
+
+            btn.addEventListener('touchstart', startHold, { passive: false });
+            btn.addEventListener('touchend', endHold);
+            btn.addEventListener('mousedown', startHold);
+            btn.addEventListener('mouseup', endHold);
+            btn.addEventListener('mouseleave', endHold);
+        }
+
+        function collectPartner() {
+            if (!activePartnerData || activePartnerData.isCollected) return;
+            activePartnerData.isCollected = true;
+            collectedPartners.push(activePartnerData);
+
+            // 插入到 grid 容器中
+            const grid = document.getElementById('collection-grid');
+            const slot = document.createElement('div'); slot.className = 'collected-item';
+            slot.innerHTML = `<img src="${activePartnerData.config.img}">`;
+            grid.appendChild(slot);
+
+            if (collectedPartners.length === 6) document.getElementById('ensemble-trigger').style.display = 'block';
+            document.getElementById('interaction-ui').style.display = 'none';
+        }
+
+        function initEnsemble() {
+            const trigger = document.getElementById('ensemble-trigger'), vCont = document.getElementById('ensemble-video-container');
+            const vPlay = document.getElementById('ensemble-video-player'), cCont = document.getElementById('curtain-container');
+            const lC = document.getElementById('curtain-left'), rC = document.getElementById('curtain-right');
+            const successModal = document.getElementById('success-modal');
+            trigger.onclick = () => {
+                cCont.style.display = 'block';
+                setTimeout(() => { lC.style.transform = 'translateX(0)'; rC.style.transform = 'translateX(0)'; }, 50);
+                setTimeout(() => {
+                    isEnsembleMode = true; document.getElementById('game-ui').style.display = 'none';
+                    document.getElementById('settings-menu').style.display = 'none';
+                    if (joyWrapper) joyWrapper.style.display = 'none';
+                    vCont.style.display = 'flex'; vPlay.currentTime = 0; forestBGM.muted = true;
+                    if (ensembleAudio) ensembleAudio.pause();
+                    ensembleAudio = new Audio('assets/audio/bgm_event_ensemble.mp3');
+                    setTimeout(() => { lC.style.transform = 'translateX(-100%)'; rC.style.transform = 'translateX(100%)'; vPlay.play(); ensembleAudio.play(); }, 500);
+                    ensembleAudio.onended = () => {
+                        lC.style.transform = 'translateX(0)'; rC.style.transform = 'translateX(0)';
+                        setTimeout(() => { isEnsembleMode = false; vPlay.pause(); vCont.style.display = 'none'; successModal.style.display = 'flex'; }, 1200);
+                    };
+                }, 1300);
+            };
+        }
+
+        window.addEventListener('resize', () => { if (camera && renderer) { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); } });
+    </script>
+</body>
+
+</html>
